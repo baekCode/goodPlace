@@ -1,12 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {MapWrap} from '@components/Map/styles';
+
+declare global {
+  interface Window {
+    kakao: any;
+  }
+}
 
 interface ICoordsState {
   latitude: number;
-  longitude: number
+  longitude: number;
 }
 
-export default function Map() {
+function KakaoMaps() {
   const [coords, setCoords] = useState<ICoordsState>({
     latitude : 37.511337,
     longitude: 127.012084,
@@ -27,18 +32,24 @@ export default function Map() {
   }, []);
 
   useEffect(() => {
-    const initMap = () => {
-      if (naver) {
-        const map = new naver.maps.Map('map', {
-          center: new naver.maps.LatLng(coords.latitude, coords.longitude),
-          zoom  : 13,
-        });
-      }
+    const container = document.getElementById('map');
+    const options = {
+      center: new window.kakao.maps.LatLng(coords.latitude, coords.longitude), //지도의 중심좌표.
+      level : 5
     };
-    initMap();
+
+    const map = new window.kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+
   }, [coords]);
 
   return (
-    <MapWrap id="map"/>
+    <div className="App">
+      <div id="map" style={{
+        width : '100vw',
+        height: '100vh'
+      }}/>
+    </div>
   );
 }
+
+export default KakaoMaps;
