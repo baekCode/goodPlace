@@ -39,7 +39,11 @@ function KakaoMaps() {
     };
 
     const map = new window.kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
-
+    const markerPosition = new window.kakao.maps.LatLng(coords.latitude, coords.longitude);
+    const marker = new window.kakao.maps.Marker({
+      position: markerPosition
+    });
+    marker.setMap(map);
   }, [coords]);
 
   return (
