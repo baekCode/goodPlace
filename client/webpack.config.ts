@@ -66,7 +66,13 @@ const config: webpack.Configuration = {
     new webpack.EnvironmentPlugin({NODE_ENV: isDevelopment ? 'development' : 'production'}),
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(dotenv.config().parsed)
-    })
+    }),
+    new HtmlWebpackPlugin({
+      templateParameters: {
+        'client_id': process.env.REACT_APP_NAVER_MAP_CLIENT_ID
+      },
+      template          : 'index.html'
+    }),
   ],
   output   : {
     path      : path.join(__dirname, 'dist'),
