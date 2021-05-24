@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {MapWrap, MapRegion} from './styles';
 
 declare global {
   interface Window {
@@ -16,6 +17,19 @@ function KakaoMaps() {
     latitude : 37.511337,
     longitude: 127.012084,
   });
+  const [region, setRegion] = useState();
+
+  function displayCenterInfo(result: any, status: any) {
+    if (status === window.kakao.maps.services.Status.OK) {
+      for (let i = 0; i < result.length; i++) {
+        // 행정동의 region_type 값은 'H' 이므로
+        if (result[i].region_type === 'H') {
+          setRegion(result[i].address_name);
+          break;
+        }
+      }
+    }
+  }
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -39,20 +53,26 @@ function KakaoMaps() {
     };
 
     const map = new window.kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+    const geocoder = new window.kakao.maps.services.Geocoder();
     const markerPosition = new window.kakao.maps.LatLng(coords.latitude, coords.longitude);
     const marker = new window.kakao.maps.Marker({
       position: markerPosition
     });
     marker.setMap(map);
+
+    function searchAddrFromCoords(coords: any, callback: any) {
+      geocoder.coord2RegionCode(coords.getLng(), coords.getLat(), callback);
+    }
+
+    searchAddrFromCoords(map.getCenter(), displayCenterInfo);
   }, [coords]);
 
   return (
-    <div className="App">
-      <div id="map" style={{
-        width : '100vw',
-        height: '100vh'
-      }}/>
-    </div>
+    <>
+      <MapWrap id={'map'}>
+        <MapRegion children={region}/>
+      </MapWrap>
+    </>
   );
 }
 
