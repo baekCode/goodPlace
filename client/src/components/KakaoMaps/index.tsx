@@ -1,25 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {MapWrap, MapRegion} from './styles';
-
-declare global {
-  interface Window {
-    kakao: any;
-  }
-}
-
-interface ICoordsState {
-  latitude: number;
-  longitude: number;
-}
+import {ICoordsState, IResultState} from './interface';
 
 function KakaoMaps() {
+  const [region, setRegion] = useState<string>();
   const [coords, setCoords] = useState<ICoordsState>({
     latitude : 37.511337,
     longitude: 127.012084,
   });
-  const [region, setRegion] = useState();
 
-  function displayCenterInfo(result: any, status: any) {
+  function displayCenterInfo(result: IResultState[], status: string): void {
     if (status === window.kakao.maps.services.Status.OK) {
       for (let i = 0; i < result.length; i++) {
         // 행정동의 region_type 값은 'H' 이므로
