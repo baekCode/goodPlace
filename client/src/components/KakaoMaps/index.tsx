@@ -3,7 +3,7 @@ import {MapWrap, MapRegion} from './styles';
 import {ICoordsState, IResultState} from './interface';
 
 function KakaoMaps() {
-  const [region, setRegion] = useState<string>();
+  const [region, setRegion] = useState<IResultState>();
   const [coords, setCoords] = useState<ICoordsState>({
     latitude : 37.511337,
     longitude: 127.012084,
@@ -11,13 +11,7 @@ function KakaoMaps() {
 
   function displayCenterInfo(result: IResultState[], status: string): void {
     if (status === window.kakao.maps.services.Status.OK) {
-      for (let i = 0; i < result.length; i++) {
-        // 행정동의 region_type 값은 'H' 이므로
-        if (result[i].region_type === 'H') {
-          setRegion(result[i].address_name);
-          break;
-        }
-      }
+      setRegion(result.filter(v => v.region_type === 'H')[0]);
     }
   }
 
@@ -60,7 +54,7 @@ function KakaoMaps() {
   return (
     <>
       <MapWrap id={'map'}>
-        <MapRegion children={region}/>
+        <MapRegion children={region?.address_name}/>
       </MapWrap>
     </>
   );
