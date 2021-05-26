@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {MapWrap, MapRegion} from './styles';
-import {ICoordsState, IResultState, IPlaceSearchListData} from './interface';
+import {MapWrap} from './styles';
+import {ICoordsState, IPlaceSearchListData, IResultState} from './interface';
+import SearchForm from '../SearchForm';
 
 function KakaoMaps() {
   const [region, setRegion] = useState<IResultState>();
@@ -98,7 +99,7 @@ function KakaoMaps() {
   return (
     <>
       <MapWrap id={'map'}>
-        <MapRegion children={region?.address_name}/>
+        <SearchForm addressName={region?.address_name}/>
       </MapWrap>
     </>
   );
