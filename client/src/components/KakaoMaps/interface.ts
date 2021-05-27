@@ -4,15 +4,6 @@ declare global {
   }
 }
 
-export interface ICoordsState {
-  latitude: number;
-  longitude: number;
-  options: {
-    center: any,
-    level: number
-  }
-}
-
 export interface IResultState {
   address_name: string;
   code: string;
