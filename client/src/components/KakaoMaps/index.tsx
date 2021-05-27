@@ -1,16 +1,26 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {MapWrap} from './styles';
 import {ICoordsState, IPlaceSearchListData, IResultState} from './interface';
 import SearchForm from '../SearchForm';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../store';
 
 function KakaoMaps() {
   const [region, setRegion] = useState<IResultState>();
   const [coords, setCoords] = useState<ICoordsState>({
     latitude : 37.511337,
     longitude: 127.012084,
+    options  : {
+      center: new window.kakao.maps.LatLng(37.511337, 127.012084),
+      level : 5
+    }
   });
 
+  const {keyword} = useSelector((state: RootState) => state.search);
+  const mapRef = useRef(null);
+
   function displayCenterInfo(result: IResultState[], status: string): void {
+    console.log(result);
     if (status === window.kakao.maps.services.Status.OK) {
       setRegion(result.filter(v => v.region_type === 'H')[0]);
     }
@@ -22,7 +32,11 @@ function KakaoMaps() {
         setCoords(prev => ({
           ...prev,
           latitude : pos.coords.latitude,
-          longitude: pos.coords.longitude
+          longitude: pos.coords.longitude,
+          options  : {
+            ...prev.options,
+            center: new window.kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
+          }
         }));
       });
     } else {
@@ -31,19 +45,31 @@ function KakaoMaps() {
   }, []);
 
   useEffect(() => {
-    const container = document.getElementById('map');
-    const options = {
-      center: new window.kakao.maps.LatLng(coords.latitude, coords.longitude), //지도의 중심좌표.
-      level : 5
-    };
 
-    const map = new window.kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
-    const geocoder = new window.kakao.maps.services.Geocoder();
+    const map = new window.kakao.maps.Map(mapRef.current, coords.options); //지도 생성 및 객체 리턴
     const markerPosition = new window.kakao.maps.LatLng(coords.latitude, coords.longitude);
     const marker = new window.kakao.maps.Marker({
       position: markerPosition
     });
     marker.setMap(map);
+
+    const geocoder = new window.kakao.maps.services.Geocoder();
+
+    function searchAddrFromCoords(coords: any, callback: any) {
+      geocoder.coord2RegionCode(coords.getLng(), coords.getLat(), callback);
+    }
+
+    searchAddrFromCoords(map.getCenter(), displayCenterInfo);
+
+  }, [coords]);
+
+  useEffect(() => {
+
+  }, [region]);
+
+  useEffect(() => {
+    const map = new window.kakao.maps.Map(mapRef.current, coords.options); //지도 생성 및 객체 리턴
+    const geocoder = new window.kakao.maps.services.Geocoder();
 
     function searchAddrFromCoords(coords: any, callback: any) {
       geocoder.coord2RegionCode(coords.getLng(), coords.getLat(), callback);
@@ -55,7 +81,7 @@ function KakaoMaps() {
     const ps = new window.kakao.maps.services.Places();
     const infowindow = new window.kakao.maps.InfoWindow({zIndex: 1});
     // 키워드로 장소를 검색합니다
-    ps.keywordSearch(`${region?.region_3depth_name} 맛집`, placesSearchCB);
+    ps.keywordSearch(keyword ? keyword : region?.region_3depth_name, placesSearchCB);
 
     // 키워드 검색 완료 시 호출되는 콜백함수 입니다
     function placesSearchCB(data: IPlaceSearchListData[], status: string, pagination: any) {
@@ -71,6 +97,7 @@ function KakaoMaps() {
 
         // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
         map.setBounds(bounds);
+        searchAddrFromCoords(map.getCenter(), displayCenterInfo);
       }
     }
 
@@ -90,15 +117,11 @@ function KakaoMaps() {
       });
     }
 
-  }, [coords]);
-
-  useEffect(() => {
-    // console.log(region);
-  }, [region]);
+  }, [keyword]);
 
   return (
     <>
-      <MapWrap id={'map'}>
+      <MapWrap id={'map'} ref={mapRef}>
         <SearchForm addressName={region?.address_name}/>
       </MapWrap>
     </>
