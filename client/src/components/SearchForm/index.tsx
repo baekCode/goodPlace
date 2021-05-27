@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Container, MapRegion} from './styles';
+import {BlindTitle, Container, MapRegion} from './styles';
 import {useDispatch} from 'react-redux';
 import {changeKeyword} from '../../store/search';
 
@@ -20,7 +20,7 @@ export default function SearchForm({addressName}: ISearchForm) {
   };
   return (
     <Container>
-      <h1>검색폼</h1>
+      <BlindTitle>검색폼</BlindTitle>
       <form onSubmit={onSubmit}>
         <input ref={inputRef} type="text" value={keyword} onChange={onChange}/>
         <button>검색</button>

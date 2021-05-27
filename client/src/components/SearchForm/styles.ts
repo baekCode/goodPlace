@@ -15,3 +15,12 @@ export const MapRegion = styled.p`
   padding: 0.75rem;
   text-align: center;  
 `;
+
+export const BlindTitle = styled.h1`
+  overflow: hidden;
+  position: absolute;
+  width:0;
+  height:0;
+  font-size:0;
+  line-height: 0;
+`;
